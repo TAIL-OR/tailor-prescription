@@ -1,7 +1,7 @@
 [project]
-name = "max-icu-beds"
+name = "min-costs-icu-beds"
 version = "0.0.1"
-description = "Maximize the allocation of ICU beds in the territory of Brazil's Federal District during public health emergencies, considering a fixed budget, as well as available equipment and professional staff in each hospital."
+description = "Minimize the costs for the allocation of ICU beds in the territory of Brazil's Federal District during public health emergencies, considering a fixed demand."
 authors = ["Lara Pontes <laradicp@gmail.com>"]
 
 [project.dependencies]
