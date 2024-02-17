@@ -31,11 +31,35 @@ class Data:
       for _ in self.F:
         self.m.append([int(n) for n in file_object.readline().split()])
       self.t = [] # t: transfer cost of each requirement among hospitals
-      for _ in (self.E + self.S):
+      for _ in self.E:
         costs_for_req_j = []
         for _ in self.F:
           costs_for_req_j.append([int(n) for n in file_object.readline().split()])
         self.t.append(costs_for_req_j)
+      for _ in self.I:
+        self.t.append(None)
+      for _ in self.S:
+        costs_for_req_j = []
+        for _ in self.F:
+          costs_for_req_j.append([int(n) for n in file_object.readline().split()])
+        self.t.append(costs_for_req_j)
+
+  def print_data(self):
+    print('F:', self.F)
+    print('K:', self.K)
+    print('E:', self.E)
+    print('I:', self.I)
+    print('S:', self.S)
+    print('d:', self.d)
+    print('c:', self.c)
+    print('l:', self.l)
+    print('u:', self.u)
+    print('p:', self.p)
+    print('r:', self.r)
+    print('n:', self.n)
+    print('a:', self.a)
+    print('m:', self.m)
+    print('t:', self.t)
 
 class Model:
   def __init__(self, data):
