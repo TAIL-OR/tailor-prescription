@@ -32,7 +32,7 @@ This model aims to minimize costs related to constructing new hospitals and acqu
 ## Formulation
 
 $$\begin{align}
-    \min & \sum_{i \in F} \left(c_i y_i + \sum_{j \in R} p_j z_{ji} + \sum_{j \in E \cup I} m_j w_{ji} + \sum_{j \in E \cup S} \sum_{l \in F\ |\ l \neq i} t_{jil} v_{jil}\right) \\
+    \min & \sum_{i \in F} \left(c_i y_i + \sum_{j \in R} p_j z_{ji} + \sum_{j \in E \cup I} m_{ji} w_{ji} + \sum_{j \in E \cup S} \sum_{l \in F\ |\ l \neq i} t_{jil} v_{jil}\right) \\
 \text{subject to}   & \quad \sum_{i \in F} x_i \geq d \\
   & \quad a_{ji} + z_{ji} + w_{ji} + \sum_{l \in F\ |\ l \neq i} v_{jli} - v_{jil} \geq n_j x_i \quad \forall\ i \in F, j \in E \\
   & \quad a_{ji} + z_{ji} + w_{ji} \geq n_j x_i \quad \forall\ i \in F, j \in I \\
