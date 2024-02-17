@@ -69,11 +69,11 @@ class Model:
     model.I = data.I
     model.S = data.S
     model.K = data.K
-    model.x = pyo.Var(model.F, within=pyo.Integers) # x: number of ICU beds in each facility
+    model.x = pyo.Var(model.F, within=pyo.NonNegativeIntegers) # x: number of ICU beds in each facility
     model.y = pyo.Var(model.F, within=pyo.Binary) # y: whether each facility is built or not
-    model.z = pyo.Var(model.F, (model.E + model.I + model.S), within=pyo.Integers) # z: number of each requirement acquired by each facility
-    model.w = pyo.Var(model.F, (model.E + model.I), within=pyo.Integers) # w: number of each requirement repaired in each facility
-    model.v = pyo.Var((model.E + model.S), model.F, model.F, within=pyo.Integers) # v: number of each requirement transferred from each facility to each facility
+    model.z = pyo.Var(model.F, (model.E + model.I + model.S), within=pyo.NonNegativeIntegers) # z: number of each requirement acquired by each facility
+    model.w = pyo.Var(model.F, (model.E + model.I), within=pyo.NonNegativeIntegers) # w: number of each requirement repaired in each facility
+    model.v = pyo.Var((model.E + model.S), model.F, model.F, within=pyo.NonNegativeIntegers) # v: number of each requirement transferred from each facility to each facility
     # Objective function
     model.objective = pyo.Objective(expr=sum(data.c[i]*model.y[i] + sum(data.p[j]*model.z[i, j]
       for j in (model.E + model.I + model.S)) + sum(data.m[i][j]*model.w[i, j]
@@ -86,7 +86,7 @@ class Model:
     for i in model.F:
       for j in model.E:
         model.equipment_constraint.add(data.a[i][j] + model.z[i, j] + model.w[i, j] +
-          sum(model.v[j, i, l] for l in model.F if l != i) >= data.n[j]*model.x[i])
+          sum(model.v[j, l, i] - model.v[j, i, l] for l in model.F if l != i) >= data.n[j]*model.x[i])
     model.infrastructure_constraint = pyo.ConstraintList()
     for i in model.F:
       for j in model.I:
@@ -95,8 +95,8 @@ class Model:
     model.staff_constraint = pyo.ConstraintList()
     for i in model.F:
       for j in model.S:
-        model.staff_constraint.add(data.a[i][j] + model.z[i, j] + sum(model.v[j, i, l]
-          for l in model.F if l != i) >= data.n[j]*model.x[i])
+        model.staff_constraint.add(data.a[i][j] + model.z[i, j] + sum(model.v[j, l, i] -
+          model.v[j, i, l] for l in model.F if l != i) >= data.n[j]*model.x[i])
     model.repair_constraint = pyo.ConstraintList()
     for i in model.F:
       for j in (model.E + model.I):
@@ -112,6 +112,7 @@ class Model:
     for i in model.F:
       model.y_dependent_constraint.add(model.x[i] / data.u[i] <= model.y[i])
       model.y_dependent_constraint.add(model.y[i] <= model.x[i])
+    model.write('model.lp', io_options={'symbolic_solver_labels': True})
     opt = pyo.SolverFactory('appsi_highs')
     results = opt.solve(model, tee=True)
     results.write()
