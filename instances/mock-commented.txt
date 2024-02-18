@@ -8,9 +8,8 @@
 100 5000 12000 7000 30000 5000 20000 # cost of acquiring each requirement in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
 50 300 700 100 2000 # cost of repairing each requirement in order (oximeter, ecg, ventilator, laundry, x-ray)
 1 1 1 0.1 0.15 0.4 0.1 # necessary rate of each requirement per icu bed in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
-12 12 13 2 2 6 2 # availability of each requirement in each hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
-10 10 10 1 2 0 0
-30 25 23 3 4 10 3
+12 12 12 2 2 6 2 # availability of each requirement in each built hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
+30 24 23 3 4 10 3
 0 0 1 0 0 # number of units of each requirement in need of repair in each hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
 0 0 0 0 0
 0 1 0 0 0
