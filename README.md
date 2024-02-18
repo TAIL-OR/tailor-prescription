@@ -33,23 +33,24 @@ This model aims to minimize costs related to constructing new hospitals and acqu
 
 $$\begin{align}
     \min & \sum_{i \in F} \left(c_i y_i + \sum_{j \in R} p_j z_{ji} + \sum_{j \in E \cup I} m_{ji} w_{ji} + \sum_{j \in E \cup S} \sum_{l \in F\ |\ l \neq i} t_{jil} v_{jil}\right) \\
-\text{subject to}   & \quad \sum_{i \in F} x_i \geq d \\
-  & \quad a_{ji} + z_{ji} + w_{ji} + \sum_{l \in F\ |\ l \neq i} v_{jli} - v_{jil} \geq n_j x_i \quad \forall\ i \in F, j \in E \\
-  & \quad a_{ji} + z_{ji} + w_{ji} \geq n_j x_i \quad \forall\ i \in F, j \in I \\
-  & \quad a_{ji} + z_{ji} + \sum_{l \in F\ |\ l \neq i} v_{jli} - v_{jil} \geq n_j x_i \quad \forall\ i \in F, j \in S \\
-  & \quad w_{ji} \leq m_{ji} \quad \forall\ i \in F, j \in E \cup I \\
-  & \quad y_i l_i \leq x_i \leq u_i \quad \forall\ i \in F \\
-  & \quad y_i = 1 \quad \forall\ i \in K \\
-  & \quad x_i/u_i \leq y_i \leq x_i \quad \forall\ i \in F \\
-  & \quad x_i \in \mathbb{Z} \quad \forall\ i \in F \\
-  & \quad y_i \in \{0, 1\} \quad \forall\ i \in F \\
-  & \quad z_{ji} \in \mathbb{Z} \quad \forall\ i \in F, j \in R \\
-  & \quad w_{ji} \in \mathbb{Z} \quad \forall\ i \in F, j \in E \cup I \\
-  & \quad v_{jil} \in \mathbb{Z} \quad \forall\ i, l \in F, j \in E \cup S.
+\text{subject to}   & \qquad \sum_{i \in F} x_i \geq d \\
+  & \qquad a_{ji} + z_{ji} + w_{ji} + \sum_{l \in F\ |\ l \neq i} v_{jli} - v_{jil} \geq n_j x_i && i \in F, j \in E \\
+  & \qquad a_{ji} + z_{ji} + w_{ji} \geq n_j x_i && i \in F, j \in I \\
+  & \qquad a_{ji} + z_{ji} + \sum_{l \in F\ |\ l \neq i} v_{jli} - v_{jil} \geq n_j x_i && i \in F, j \in S \\
+  & \qquad w_{ji} \leq m_{ji} && i \in F, j \in E \cup I \\
+  & \qquad \sum_{l \in F\ |\ l \neq i} v_{jil} \leq a_{ji} && i \in F, j \in E \cup S \\
+  & \qquad y_i l_i \leq x_i \leq u_i && i \in F \\
+  & \qquad y_i = 1 && i \in K \\
+  & \qquad x_i/u_i \leq y_i \leq x_i && i \in F \\
+  & \qquad x_i \in \mathbb{Z} && i \in F \\
+  & \qquad y_i \in \{0, 1\} && i \in F \\
+  & \qquad z_{ji} \in \mathbb{Z} && i \in F, j \in R \\
+  & \qquad w_{ji} \in \mathbb{Z} && i \in F, j \in E \cup I \\
+  & \qquad v_{jil} \in \mathbb{Z} && i, l \in F, j \in E \cup S.
 \end{align}
 $$
 
-The objective function aims to minimize the sum of costs for constructing new hospitals and acquiring, repairing, and transferring requirements for all hospitals. Constraints 1 ensure that the total demand for ICU beds is met. Constraints 2-4 determine that each hospital has all necessary requirements to operate its ICU beds, considering present requirements ($a_{ji}$), acquired ($z_{ji}$), repaired ($w_{ji}$), incoming transfers ($v_{jli}$), and outgoing transfers ($v_{jil}$). Constraints 5 limit the number of requirements undergoing repair to the number of requirements in that condition in each hospital, while Constraints 6 limit the number of ICU beds per hospital within the minimum and maximum allowed. Constraints 7 inform about existing constructed hospitals. Constraints 8 ensure that $y_i=1$ if $x_i$ is positive (i.e., if hospital $i$ has at least one ICU bed, then it is necessarily constructed). Finally, Domain Constraints 9-13 ensure that the variables $x_i$, $z_{ji}$, $w_{ji}$, and $v_{jil}$ are integers, and the variables $y_i$ are binary.
+The objective function aims to minimize the sum of costs for constructing new hospitals and acquiring, repairing, and transferring requirements for all hospitals. Constraints 1 ensure that the total demand for ICU beds is met. Constraints 2-4 determine that each hospital has all necessary requirements to operate its ICU beds, considering present requirements ($a_{ji}$), acquired ($z_{ji}$), repaired during maintenance ($w_{ji}$), incoming transfers ($v_{jli}$), and outgoing transfers ($v_{jil}$). Constraints 5 limit the number of requirements undergoing repair to the number of requirements in that condition in each hospital, while Constraints 6 limit the outgoing transferred requirements ($v_{jil}$) to those present in that hospital ($a_{ji}$). Constraints 7 limit the number of ICU beds per hospital within the minimum and maximum allowed, and Constraints 8 inform about existing constructed hospitals. Constraints 9 ensure that $y_i=1$ if $x_i$ is positive (i.e., if hospital $i$ has at least one ICU bed, then it is necessarily constructed). Finally, Domain Constraints 10-14 ensure that the variables $x_i$, $z_{ji}$, $w_{ji}$, and $v_{jil}$ are integers, and the variables $y_i$ are binary.
 
 ## Installation
 
