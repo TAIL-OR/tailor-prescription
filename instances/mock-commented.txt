@@ -1,5 +1,5 @@
 3 # facilities
-1 # facility of id 1 is not built
+0 2 # facilities of id 0 and 2 are built
 3 2 2 # 3 equipments (oximeter, ecg, ventilator), 2 infrastructure requirements (laundry, x-ray), 2 staff requirements (nurse, doctor)
 50 # demand for icu beds
 1000000 1000000 2000000 # cost of building each hospital
