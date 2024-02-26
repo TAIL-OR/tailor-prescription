@@ -1,6 +1,6 @@
 # Prescriptive model for cost minimization in ICU bed management
 
-This model aims to minimize costs related to constructing new hospitals and acquiring, repairing, and transfering equipments, infrastructure, and staff while managing the allocation of ICU beds in the territory of Brazil's Federal District.
+This model aims to minimize costs related to constructing new hospitals and acquiring, repairing, and transferring equipments, infrastructure, and staff while managing the allocation of ICU beds in the territory of Brazil's Federal District.
 
 ## Data
 
