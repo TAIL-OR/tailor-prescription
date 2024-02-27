@@ -10,8 +10,7 @@
 1 1 1 0.1 0.15 0.4 0.1 # necessary rate of each requirement per icu bed in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
 12 12 12 2 2 6 2 # availability of each requirement in each built hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
 30 24 23 3 4 10 3
-0 0 1 0 0 # number of units of each requirement in need of repair in each hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
-0 0 0 0 0
+0 0 1 0 0 # number of units of each requirement in need of repair in each built hospital in order (oximeter, ecg, ventilator, laundry, x-ray, nurse, doctor)
 0 1 0 0 0
 0 10 12 # transfer cost of each requirement among hospitals (for example, requirement 0 - oximeter - has cost 12 to be transfered between hospital 0 and hospital 2)
 10 0 20

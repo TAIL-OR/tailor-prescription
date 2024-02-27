@@ -30,8 +30,11 @@ class Data:
         else:
           self.a.append([0]*len(self.E + self.I + self.S))
       self.m = [] # m: number of units of each requirement in need of repair
-      for _ in self.F:
-        self.m.append([int(n) for n in file_object.readline().split()])
+      for i in self.F:
+        if i in self.K:
+          self.m.append([int(n) for n in file_object.readline().split()])
+        else:
+          self.m.append([0]*len(self.E + self.I))
       self.t = [] # t: transfer cost of each requirement among hospitals
       for _ in self.E:
         costs_for_req_j = []
@@ -223,259 +226,346 @@ class Model:
                   'from Hospital', l)
   
   def to_html(self):
+
+    budget = pyo.value(self.model.objective)
+    num_hospitals = len([i for i in self.model.F if pyo.value(self.model.y[i]) > 0])
+    added_beds = sum([int(pyo.value(self.model.x[i]) - min([self.data.a[i][j]/self.data.n[j]
+      for j in self.model.E + self.model.I + self.model.S])) for i in self.model.F if
+      pyo.value(self.model.y[i]) > 0])
+    
     html_content = """
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Administra&ccedil;&atilde;o de leitos</title>
-      <style>
-        body {
-        font-family: 'Helvetica', sans-serif;
-        color: #707070;
-        background-color: #f9f9f9;
-        }
-        .header {
-        margin: -10px -10px 10px;
-        background-color: #000;
-        }
-        .title {
-        font-size: 26px;
-        font-weight: bold;
-        text-align: center;
-        margin: 20px;
-        }
-        .subtitle {
-        font-size: 16px;
-        margin: 20px;
-        }
-        .section-box {
-        border: 1px solid #707070;
-        margin: 10px;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .subsection-box {
-        margin: 5px;
-        border-color: #707070;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0,0,0,0);
-        }
-        .clear-box {
-        padding: 5px;
-        }
-        .section {
-        font-size: 16px;
-        font-weight: bold;
-        border-color: #707070;
-        background-color: #e9ecef;
-        }
-        .content {
-        font-size: 14px;
-        font-weight: normal;
-        }
-      </style>
-      </head>
-      <body>
-      <div class="title">
-        Prescri&ccedil;&atilde;o de administra&ccedil;&atilde;o de leitos de UTI
-      </div>
-      <hr>
-      """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administra&ccedil;&atilde;o de leitos</title>
+<style>
+body {
+    font-family: 'Helvetica', sans-serif;
+    color: #707070;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #16497F;
+    color: #fff;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.subtitle {
+    margin: 30px 20px 0px 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #505050;
+}
+
+.hospital-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin: 20px;
+}
+
+.hospital-box {
+    width: calc(28%);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    background-color: #ffffff;
+}
+
+.clear-box {
+    padding: 5px;
+}
+
+.content {
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.image-box {
+    width: calc(20%);
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    background-color: #16497F; /* Blue color */
+    color: #fff;
+    text-align: center;
+}
+
+.image-box img {
+    height: 70px;
+    display: block;
+    margin: 0 auto 10px; /* Center the image */
+}
+
+.image-box p {
+    margin: 0; /* Remove default margin */
+}
+
+.footer-box {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+}
+
+.footer-box img {
+    margin: 0px calc(3%);
+    height: 60px;
+}
+
+</style>
+</head>
+<body>
+<div class="header title">
+    Prescri&ccedil;&atilde;o de administra&ccedil;&atilde;o de leitos de UTI
+</div>
+<div class="subtitle">
+    <p>Informa&ccedil;&otilde;es gerais</p>
+</div>
+<div class="hospital-container">
+    <div class="image-box">
+        <img src="figures/coins.png" alt="Stack of coins">
+        <div class="content">Or&ccedil;amento previsto</div>
+        <div class="content"> R$ """
+    budget_str = str(f'{budget:,}').replace('.', ',')
+    html_content += budget_str.replace(',', '.', budget_str.count(',') - 1) + """ </div>
+    </div>
+    <div class="image-box">
+        <img src="figures/hospital.png" alt="Hospital">
+        <div class="content">Hospitais beneficiados</div> 
+        <div class="content"> {} </div>
+    </div>""".format(num_hospitals)
+    html_content += """
+    <div class="image-box">
+        <img src="figures/hospital_bed.png" alt="Hospital beds">
+        <div class="content">Leitos adicionados</div>
+        <div class="content"> {} </div>
+    </div>
+</div>
+<div class="subtitle">
+    <p>A&ccedil;&otilde;es prescritas</p>
+</div>
+<div class="hospital-container">
+""".format(added_beds)
 
     # Add section for hospitals information
     for i in self.model.F:
-      if pyo.value(self.model.y[i]) > 0:
-        html_content += """
-          <div class="section-box section">
-          <div class="clear-box">
-            Hospital {}""".format(i)
-
-        if i not in self.model.K:
-          html_content += """
-            <div class="clear-box content">
-            Construção: {}
-            </div>
-          """.format(self.data.c[i])
-
-        cur_beds = min([self.data.a[i][j] / self.data.n[j] for j in self.model.E + self.model.I +
-                self.model.S])
-        html_content += """
-          <div class="clear-box content">
-          Leitos de UTI totais: {}
-          </div>
-          <div class="clear-box content">
-          Leitos de UTI adicionados: {}
-          </div>
-        """.format(int(pyo.value(self.model.x[i])), int(pyo.value(self.model.x[i]) - cur_beds))
-
-        printedAcquire = False
-        for j in self.model.E:
-          if pyo.value(self.model.z[i, j]) > 0:
-            if not printedAcquire:
-              html_content += """
-                <div class="clear-box content">
-                Adquirir:
-              """
-              printedAcquire = True
+        if pyo.value(self.model.y[i]) > 0:
             html_content += """
-              <div class="clear-box content">
-              {} unidades do equipamento {}
-              </div>
-            """.format(int(pyo.value(self.model.z[i, j])), j)
+<div class="hospital-box">
+    <div class="clear-box">
+        <strong> Hospital {} </strong> 
+""".format(i)
 
-        for j in self.model.I:
-          if pyo.value(self.model.z[i, j]) > 0:
-            if not printedAcquire:
-              html_content += """
-                <div class="clear-box content">
-                Adquirir:
-              """
-              printedAcquire = True
-            html_content += """
-              <div class="clear-box content">
-              {} unidades da infraestrutura {}
-              </div>
-            """.format(int(pyo.value(self.model.z[i, j])), j)
-
-        for j in self.model.S:
-          if pyo.value(self.model.z[i, j]) > 0:
-            if not printedAcquire:
-              html_content += """
-                <div class="clear-box content">
-                Adquirir:
-              """
-              printedAcquire = True
-            html_content += """
-              <div class="clear-box content">
-              {} profissionais para o time {}
-              </div>
-            """.format(int(pyo.value(self.model.z[i, j])), j)
-
-        if printedAcquire:
-          html_content += """
-            </div>
-          """
-
-        printedRepair = False
-        for j in self.model.E:
-          if pyo.value(self.model.w[i, j]) > 0:
-            if not printedRepair:
-              html_content += """
-                <div class="clear-box content">
-                Reparar:
-              """
-              printedRepair = True
-            html_content += """
-              <div class="clear-box content">
-              {} unidades do equipamento {}
-              </div>
-            """.format(int(pyo.value(self.model.w[i, j])), j)
-
-        for j in self.model.I:
-          if pyo.value(self.model.w[i, j]) > 0:
-            if not printedRepair:
-              html_content += """
-                <div class="clear-box content">
-                Reparar:
-              """
-              printedRepair = True
-            html_content += """
-              <div class="clear-box content">
-              {} unidades da infraestrutura {}
-              </div>
-            """.format(int(pyo.value(self.model.w[i, j])), j)
-
-        if printedRepair:
-          html_content += """
-            </div>
-          """
-
-        printedTransfer = False
-        for j in self.model.E:
-          for l in self.model.F:
-            if l != i:
-              if pyo.value(self.model.v[j, i, l]) > 0:
-                if not printedTransfer:
-                  html_content += """
-                    <div class="clear-box content">
-                    Transferir:
-                  """
-                  printedTransfer = True
+            if i not in self.model.K:
                 html_content += """
-                  <div class="clear-box content">
-                  {} unidades do equipamento {} ao Hospital {}
-                  </div>
-                """.format(int(pyo.value(self.model.v[j, i, l])), j, l)
-
-        for j in self.model.S:
-          for l in self.model.F:
-            if l != i:
-              if pyo.value(self.model.v[j, i, l]) > 0:
-                if not printedTransfer:
-                  html_content += """
-                    <div class="clear-box content">
-                    Transferir:
-                  """
-                  printedTransfer = True
-                html_content += """
-                  <div class="clear-box content">
-                  {} profissionais para o time {} do Hospital {}
-                  </div>
-                """.format(int(pyo.value(self.model.v[j, i, l])), j, l)
-
-        if printedTransfer:
-          html_content += """
-            </div>
-          """
-
-        printedReceive = False
-        for j in self.model.E:
-          for l in self.model.F:
-            if l != i:
-              if pyo.value(self.model.v[j, l, i]) > 0:
-                if not printedReceive:
-                  html_content += """
-                    <div class="clear-box content">
-                    Receber:
-                  """
-                  printedReceive = True
-                html_content += """
-                  <div class="clear-box content">
-                  {} unidades do equipamento {} do Hospital {}
-                  </div>
-                """.format(int(pyo.value(self.model.v[j, l, i])), j, l)
-
-        for j in self.model.S:
-          for l in self.model.F:
-            if l != i:
-              if pyo.value(self.model.v[j, l, i]) > 0:
-                if not printedReceive:
-                  html_content += """
-                    <div class="clear-box content">
-                    Receber:
-                  """
-                  printedReceive = True
-                html_content += """
-                  <div class="clear-box content">
-                  {} profissionais do time {} do Hospital {}
-                  </div>
-                """.format(int(pyo.value(self.model.v[j, l, i])), j, l)
-
-        if printedReceive:
-          html_content += """
-            </div>
-          """
-
-      html_content += """
+        <div class="clear-box content">
+            <strong> Construção: </strong> {}
         </div>
+        """.format(self.data.c[i])
+
+            cur_beds = min([self.data.a[i][j] / self.data.n[j] for j in self.model.E + self.model.I +
+                            self.model.S])
+            html_content += """
+        <div class="clear-box content">
+            <strong> Leitos de UTI totais: </strong> {}
         </div>
-      </div>
-      </body>
-      </html>
-      """
+        <div class="clear-box content">
+            <strong> Leitos de UTI adicionados: </strong> {}
+        </div>
+    """.format(int(pyo.value(self.model.x[i])), int(pyo.value(self.model.x[i]) - cur_beds))
+
+            printedAcquire = False
+            for j in self.model.E:
+                if pyo.value(self.model.z[i, j]) > 0:
+                    if not printedAcquire:
+                        html_content += """
+        <div class="clear-box content">
+            <strong> Adquirir: </strong>
+        """
+                        printedAcquire = True
+                    html_content += """
+        <div class="clear-box content">
+            {} unidades do equipamento {}
+        </div>
+        """.format(int(pyo.value(self.model.z[i, j])), j)
+
+            for j in self.model.I:
+                if pyo.value(self.model.z[i, j]) > 0:
+                    if not printedAcquire:
+                        html_content += """
+        <div class="clear-box content">
+            <strong> Adquirir: </strong>
+        """
+                        printedAcquire = True
+                    html_content += """
+        <div class="clear-box content">
+            {} unidades da infraestrutura {}
+        </div>
+        """.format(int(pyo.value(self.model.z[i, j])), j)
+
+            for j in self.model.S:
+                if pyo.value(self.model.z[i, j]) > 0:
+                    if not printedAcquire:
+                        html_content += """
+        <div class="clear-box content">
+            <strong> Adquirir: </strong>
+        """
+                        printedAcquire = True
+                    html_content += """
+        <div class="clear-box content">
+            {} profissionais para o time {}
+        </div>
+        """.format(int(pyo.value(self.model.z[i, j])), j)
+
+            if printedAcquire:
+                html_content += """
+    </div>
+"""
+
+            printedRepair = False
+            for j in self.model.E:
+                if pyo.value(self.model.w[i, j]) > 0:
+                    if not printedRepair:
+                        html_content += """
+    <div class="clear-box content">
+        <strong> Reparar: </strong>
+    """
+                        printedRepair = True
+                    html_content += """
+    <div class="clear-box content">
+        {} unidades do equipamento {}
+    </div>
+    """.format(int(pyo.value(self.model.w[i, j])), j)
+
+            for j in self.model.I:
+                if pyo.value(self.model.w[i, j]) > 0:
+                    if not printedRepair:
+                        html_content += """
+    <div class="clear-box content">
+        <strong> Reparar: </strong>
+    """
+                        printedRepair = True
+                    html_content += """
+    <div class="clear-box content">
+        {} unidades da infraestrutura {}
+    </div>
+    """.format(int(pyo.value(self.model.w[i, j])), j)
+
+            if printedRepair:
+                html_content += """
+    </div>
+"""
+
+            printedTransfer = False
+            for j in self.model.E:
+                for l in self.model.F:
+                    if l != i:
+                        if pyo.value(self.model.v[j, i, l]) > 0:
+                            if not printedTransfer:
+                                html_content += """
+    <div class="clear-box content">
+        <strong> Transferir: </strong>
+    """
+                                printedTransfer = True
+                            html_content += """
+    <div class="clear-box content">
+        {} unidades do equipamento {} ao Hospital {}
+    </div>
+    """.format(int(pyo.value(self.model.v[j, i, l])), j, l)
+
+            for j in self.model.S:
+                for l in self.model.F:
+                    if l != i:
+                        if pyo.value(self.model.v[j, i, l]) > 0:
+                            if not printedTransfer:
+                                html_content += """
+    <div class="clear-box content">
+        <strong> Transferir: </strong>
+    """
+                                printedTransfer = True
+                            html_content += """
+    <div class="clear-box content">
+        {} profissionais para o time {} do Hospital {}
+    </div>
+    """.format(int(pyo.value(self.model.v[j, i, l])), j, l)
+
+            if printedTransfer:
+                html_content += """
+    </div>
+"""
+
+            printedReceive = False
+            for j in self.model.E:
+                for l in self.model.F:
+                    if l != i:
+                        if pyo.value(self.model.v[j, l, i]) > 0:
+                            if not printedReceive:
+                                html_content += """
+    <div class="clear-box content">
+        <strong> Receber: </strong>
+    """
+                                printedReceive = True
+                            html_content += """
+    <div class="clear-box content">
+        {} unidades do equipamento {} do Hospital {}
+    </div>
+    """.format(int(pyo.value(self.model.v[j, l, i])), j, l)
+
+            for j in self.model.S:
+                for l in self.model.F:
+                    if l != i:
+                        if pyo.value(self.model.v[j, l, i]) > 0:
+                            if not printedReceive:
+                                html_content += """
+    <div class="clear-box content">
+        <strong> Receber: </strong>
+    """
+                                printedReceive = True
+                            html_content += """
+    <div class="clear-box content">
+        {} profissionais do time {} do Hospital {}
+    </div>
+    """.format(int(pyo.value(self.model.v[j, l, i])), j, l)
+
+            if printedReceive:
+                html_content += """
+    </div>
+"""
+
+            html_content += """
+</div>
+</div>
+"""
+
+    html_content += """
+</div>
+</body>
+<hr color=#e9e9e9>
+<footer>
+<div class="footer-box">
+    <img src="figures/sus.png" alt="SUS">
+    <img src="figures/logo_20_years.png" alt="20 years">
+    <img src="figures/footer.png" alt="Footer">
+</div>
+</footer>
+</html>
+"""
     return html_content
   
 model = Model(Data('instances/mock.txt'))
