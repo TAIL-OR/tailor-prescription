@@ -71,6 +71,14 @@ class ReadData:
     }
     self.read_consumable()
 
+    self.hospital_equipments = {}
+    self.hospital_staff = {}
+    self.hospital_consumables = {}
+    for id in self.hospitals["ids"]:
+      self.read_hospital_equipment(id)
+      self.read_hospital_staff(id)
+      self.read_hospital_consumable(id)
+    
   def connect_range(self, range_name):
     try:
       service = build("sheets", "v4", credentials=self.creds)
@@ -135,5 +143,99 @@ class ReadData:
       self.consumables["prices"][id] = float(
         row[2].replace("R$ ", "").replace(".", "").replace(",", "."))
       self.consumables["necessary_rates"][id] = float(row[4])
+
+  def read_hospital_equipment(self, hospital_id):
+    values = self.connect_range(self.hospitals["names"][hospital_id] + " - Equipamento!A2:D")
+    self.hospital_equipments[hospital_id] = {}
+    for row in values:
+      self.hospital_equipments[hospital_id][int(row[0])] = [int(row[2]), int(row[3])]
+        # [<total quantity>, <needing maintenance>]
+
+  def read_hospital_staff(self, hospital_id):
+    values = self.connect_range(self.hospitals["names"][hospital_id] + " - Profissional!A2:C")
+    self.hospital_staff[hospital_id] = {}
+    for row in values:
+      self.hospital_staff[hospital_id][int(row[0])] = int(row[2])
+  
+  def read_hospital_consumable(self, hospital_id):
+    values = self.connect_range(self.hospitals["names"][hospital_id] + " - Insumo!A2:C")
+    self.hospital_consumables[hospital_id] = {}
+    for row in values:
+      self.hospital_consumables[hospital_id][int(row[0])] = int(row[2])
+
+  def get_hospital_ids(self):
+    return self.hospitals["ids"]
+  
+  def get_hospital_name(self, id):
+    return self.hospitals["names"][id]
+  
+  def get_hospital_construction_cost(self, id):
+    return self.hospitals["construction_costs"][id]
+  
+  def get_hospital_lb_beds(self, id):
+    return self.hospitals["lb_beds"][id]
+  
+  def get_hospital_ub_beds(self, id):
+    return self.hospitals["ub_beds"][id]
+  
+  def get_hospital_coords(self, id):
+    return self.hospitals["coord_x"][id], self.hospitals["coord_y"][id]
+  
+  def get_hospital_built(self, id):
+    return self.hospitals["built"][id]
+  
+  def get_equipment_ids(self):
+    return self.equipments["ids"]
+  
+  def get_equipment_name(self, id):
+    return self.equipments["names"][id]
+  
+  def get_equipment_price(self, id):
+    return self.equipments["prices"][id]
+  
+  def get_equipment_necessary_rate(self, id):
+    return self.equipments["necessary_rates"][id]
+  
+  def get_equipment_maintenance_freq(self, id):
+    return self.equipments["maintenance_freqs"][id]
+  
+  def get_equipment_maintenance_cost(self, id):
+    return self.equipments["maintenance_costs"][id]
+  
+  def get_staff_ids(self):
+    return self.staff["ids"]
+  
+  def get_staff_team(self, id):
+    return self.staff["teams"][id]
+  
+  def get_staff_salary(self, id):
+    return self.staff["salaries"][id]
+  
+  def get_staff_necessary_rate(self, id):
+    return self.staff["necessary_rates"][id]
+  
+  def get_consumable_ids(self):
+    return self.consumables["ids"]
+  
+  def get_consumable_name(self, id):
+    return self.consumables["names"][id]
+  
+  def get_consumable_price(self, id):
+    return self.consumables["prices"][id]
+  
+  def get_consumable_necessary_rate(self, id):
+    return self.consumables["necessary_rates"][id]
+  
+  def get_equipment_quantity(self, hospital_id, equipment_id):
+    return self.hospital_equipments[hospital_id][equipment_id][0]
+  
+  def get_equipment_maintenance(self, hospital_id, equipment_id):
+    return self.hospital_equipments[hospital_id][equipment_id][1]
+  
+  def get_staff_quantity(self, hospital_id, staff_id):
+    return self.hospital_staff[hospital_id][staff_id]
+  
+  def get_consumable_quantity(self, hospital_id, consumable_id):
+    return self.hospital_consumables[hospital_id][consumable_id]
 
 read_data = ReadData()
