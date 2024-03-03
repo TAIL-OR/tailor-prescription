@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 class ReadData:
   def __init__(self):
     # If modifying these scopes, delete the file token.json.
-    self.scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    self.scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 
     self.spreadsheet_id = "1P8e1KawU9v7YuTZHUYrmXV8m494r9APV_CxzxC6qhDA"
     
